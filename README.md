@@ -41,7 +41,7 @@ sdk = IslamicContentSdk()
 
 ## Detailed Service Methods Reference
 
-Below is a complete guide on how to interact with every single method and option available in the SDK.
+Below is a complete guide on how to interact with every single method available in the SDK, including the exact API endpoints and JSON response structures.
 
 ### Quran Source (QuranEnc API)
 
@@ -49,22 +49,68 @@ Below is a complete guide on how to interact with every single method and option
 
 ```python
 # 1. Get available translations list on the platform
+# HTTP Endpoint: GET https://quranenc.com/api/v1/translations/list/{language}?localization={localization}
+# Response Shape:
+# [
+#   {
+#     "translation_number": 1,
+#     "language_code": "es",
+#     "language_name": "Español",
+#     "translation_name": "...",
+#     "translation_key": "..."
+#   }
+# ]
 translations = sdk.quranenc.translationList({
     "language": "es",      # Optional: Filter list by language code
     "localization": "ar"   # Optional: Localize names in the response
 })
 
 # 2. Translate an entire sura (Al-Fatiha in Spanish)
+# HTTP Endpoint: GET https://quranenc.com/api/v1/translation/sura/{translationKey}/{suraNumber}
+# Response Shape:
+# {
+#   "result": [
+#     {
+#       "id": "1",
+#       "sura": "1",
+#       "aya": "1",
+#       "translation": "En el nombre de Alá, el Compasivo, el Misericordioso.",
+#       "footnotes": ""
+#     }
+#   ]
+# }
 sura = sdk.quranenc.translationSura("spanish_montada_eu", 1)
 
 # 3. Translate a specific verse (Ayah 1 of Sura 1)
+# HTTP Endpoint: GET https://quranenc.com/api/v1/translation/aya/{translationKey}/{suraNumber}/{ayaNumber}
+# Response Shape:
+# {
+#   "result": {
+#     "id": "1",
+#     "sura": "1",
+#     "aya": "1",
+#     "translation": "En el nombre de Alá, el Compasivo, el Misericordioso.",
+#     "footnotes": ""
+#   }
+# }
 aya = sdk.quranenc.translationAya("spanish_montada_eu", 1, 1)
 
 # 4. Get the audio MP3 file details for a specific verse
+# HTTP Endpoint: GET https://d.quranenc.com/data/audio/{translationKey}/{sura3Digits}{aya3Digits}.mp3
+# Response Shape:
+# {
+#   "status": 200,
+#   "file_url": "https://d.quranenc.com/data/audio/chinese_suliman/001001.mp3",
+#   "content_type": "audio/mpeg"
+# }
 audio = sdk.quranenc.ayaAudio("chinese_suliman", 1, 1)
-# Returns: {"status": 200, "file_url": "...", "content_type": "audio/mpeg"}
 
 # 5. Submit translation feedback/note (POST request)
+# HTTP Endpoint: POST https://quranenc.com/api/v1/translations/note
+# Response Shape:
+# {
+#   "message": "Note added successfully"
+# }
 note_response = sdk.quranenc.addNote({
     "sura": 1,
     "aya": 1,
@@ -86,23 +132,68 @@ note_response = sdk.quranenc.addNote({
 
 ```python
 # 1. Get available languages in the encyclopedia
+# HTTP Endpoint: GET https://hadeethenc.com/api/v1/languages
+# Response Shape:
+# [
+#   {
+#     "code": "ar",
+#     "native": "العربية"
+#   }
+# ]
 languages = sdk.hadeethenc.languages()
 
 # 2. Get all categories of Hadith translated in a specific language
+# HTTP Endpoint: GET https://hadeethenc.com/api/v1/categories/list/?language={languageCode}
+# Response Shape:
+# [
+#   {
+#     "id": "1",
+#     "title": "Belief",
+#     "parent_id": None
+#   }
+# ]
 categories = sdk.hadeethenc.categories("en")
 
 # 3. Get main (root) categories of Hadith in English
+# HTTP Endpoint: GET https://hadeethenc.com/api/v1/categories/roots/?language={languageCode}
+# Response Shape:
+# [
+#   {
+#     "id": "1",
+#     "title": "Belief",
+#     "parent_id": None
+#   }
+# ]
 root_categories = sdk.hadeethenc.rootCategories("en")
 
 # 4. List Hadiths under a category with pagination
+# HTTP Endpoint: GET https://hadeethenc.com/api/v1/hadeeths/list/?language={language}&category_id={categoryId}&page={page}&per_page={perPage}
+# Response Shape:
+# [
+#   {
+#     "id": "2962",
+#     "title": "...",
+#     "category_id": "1"
+#   }
+# ]
 hadiths = sdk.hadeethenc.hadithsList({
     "language": "en",
-    "categoryId": 1,  # Optional: Category ID
-    "page": 1,        # Optional: Page number
-    "perPage": 20     # Optional: Number of items per page
+    "categoryId": 1,  # Optional
+    "page": 1,        # Optional
+    "perPage": 20     # Optional
 })
 
 # 5. Get full explanation, translations, and grade of a specific Hadith by ID
+# HTTP Endpoint: GET https://hadeethenc.com/api/v1/hadeeths/one/?id={id}&language={language}
+# Response Shape:
+# {
+#   "id": "2962",
+#   "title": "...",
+#   "hadeeth": "...",
+#   "attribution": "...",
+#   "grade": "Authentic",
+#   "explanation": "..."
+# }
 hadith = sdk.hadeethenc.hadithDetails({
     "id": 2962,
     "language": "ar"
@@ -121,27 +212,43 @@ hadith = sdk.hadeethenc.hadithDetails({
 # ==========================================
 
 # Core material types (videos, books, fatwas, etc.)
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/sitecontent/{siteLang}/{contentLang}/json
+# Response Shape: [ { "block_name": "showall", "type": "section", "items_count": 12648, "api_url": "..." } ]
 types = sdk.islamhouse.categoriesAndTypes.allTypes("ar", "ar") # siteLang, contentLang
 
 # Get all categories in the database
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/categories/showall/{language}/json
+# Response Shape: [ { "id": 1, "title": "...", "description": "..." } ]
 all_categories = sdk.islamhouse.categoriesAndTypes.allCategories("ar")
 
 # Complete category hierarchy tree
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-object-category-tree/{language}/json
+# Response Shape: [ { "id": 1, "name": "...", "children": [...] } ]
 tree = sdk.islamhouse.categoriesAndTypes.categoriesTree("ar")
 
 # Subcategories of a category with content lang localization
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/categories/viewcat/{categoryId}/{siteLang}/{contentLang}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 child_cats = sdk.islamhouse.categoriesAndTypes.childCategories(1, "ar", "ar") # categoryId, siteLang, contentLang
 
 # Basic details of a category by ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/categories/viewitem/{categoryId}/{language}/json
+# Response Shape: { "id": 1, "title": "..." }
 single_category = sdk.islamhouse.categoriesAndTypes.singleCategoryBasic(1, "ar")
 
 # Subcategories with nested children
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-sub-categories/{categoryId}/{language}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 sub_categories = sdk.islamhouse.categoriesAndTypes.subCategories(1, "ar")
 
 # Available material types under a specific category ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-category-types-available/{categoryId}/{siteLang}/{contentLang}/json
+# Response Shape: [ { "type": "books", "count": 5 } ]
 category_types = sdk.islamhouse.categoriesAndTypes.categoryTypes(1, "ar", "ar")
 
 # Available languages for materials within a category ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-category-source-languages/{categoryId}/{slang}/{language}/json
+# Response Shape: [ { "code": "ar", "name": "Arabic" } ]
 category_langs = sdk.islamhouse.categoriesAndTypes.categoryLanguages(1, "ar", "ar") # id, slang, language
 
 # ==========================================
@@ -149,21 +256,33 @@ category_langs = sdk.islamhouse.categoriesAndTypes.categoryLanguages(1, "ar", "a
 # ==========================================
 
 # List materials by type (e.g. "books", "videos", "audios") and language
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/{type}/{siteLang}/{slang}/{page}/{limit}/json
+# Response Shape: [ { "id": 1, "title": "...", "type": "books" } ]
 items = sdk.islamhouse.items.listItems("books", "ar", "ar", 1, 25) # type, siteLang, slang, page, limit
 
 # List materials published by a specific author ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-author-items/{authorId}/{slang}/{siteLang}/{contentLang}/{page}/{limit}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 author_items = sdk.islamhouse.items.authorItems(1, "ar", "ar", "ar", 1, 20) # authorId, slang, siteLang, contentLang, page, limit
 
 # List materials categorized under a category ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-category-items/{categoryId}/{slang}/{siteLang}/{contentLang}/{page}/{limit}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 cat_items = sdk.islamhouse.items.categoryItems(1, "ar", "ar", "ar", 1, 20) # categoryId, slang, siteLang, contentLang, page, limit
 
 # List latest items by period (e.g., "week", "month")
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-latest/{period}/{slang}/{siteLang}/{contentLang}/{page}/{limit}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 latest_items = sdk.islamhouse.items.latestItems("week", "ar", "ar", "ar", 1, 25) # period, slang, siteLang, contentLang, page, limit
 
 # Highlighted featured items on the homepage
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-highlights/{siteLang}/{contentLang}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 highlights = sdk.islamhouse.items.highlightedItems("ar", "ar") # siteLang, contentLang
 
 # Get the total count of items available for a specific type
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-language-items-count/{type}/{siteLang}/{contentLang}/json
+# Response Shape: { "count": 100 }
 items_count = sdk.islamhouse.items.itemsCount("books", "ar", "ar") # type, siteLang, contentLang
 
 # ==========================================
@@ -171,18 +290,28 @@ items_count = sdk.islamhouse.items.itemsCount("books", "ar", "ar") # type, siteL
 # ==========================================
 
 # Details, metadata, and description of a single item
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-item/{itemId}/{language}/json
+# Response Shape: { "id": 228065, "title": "...", "description": "...", "prepared_by": [...] }
 item_details = sdk.islamhouse.item.details(228065, "ar")
 
 # List downloadable media/PDF attachments for an item
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/check-attachment/{itemId}/json
+# Response Shape: [ { "id": 1, "file_url": "...", "size": "..." } ]
 attachments = sdk.islamhouse.item.attachments(228065)
 
 # Category tree path leading to this item
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-item-tree/{itemId}/{language}/json
+# Response Shape: [ { "id": 1, "name": "..." } ]
 item_tree = sdk.islamhouse.item.tree(228065, "ar")
 
 # Translation card details of the item
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-item-card-translations/{itemId}/{language}/json
+# Response Shape: { "title": "...", "description": "..." }
 item_card_trans = sdk.islamhouse.item.cardTranslations(228065, "ar")
 
 # Other translation languages available for this item
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-item-translations/{itemId}/{language}/json
+# Response Shape: [ { "locale": "en", "title": "..." } ]
 translations = sdk.islamhouse.item.translations(228065, "ar")
 
 # ==========================================
@@ -190,6 +319,8 @@ translations = sdk.islamhouse.item.translations(228065, "ar")
 # ==========================================
 
 # List authors/sources with filter and sort parameters
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-authors-data/{kind}/{locale}/{sort}/{page}/{perPage}/json
+# Response Shape: [ { "id": 1, "name": "...", "count": 10 } ]
 authors = sdk.islamhouse.authors.list({
     "kind": "author",     # Optional: "showall" | "author" | "source"
     "locale": "ar",       # Optional: "showall" | language code
@@ -199,15 +330,23 @@ authors = sdk.islamhouse.authors.list({
 })
 
 # Specific author details by ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-author/{authorId}/{language}/json
+# Response Shape: { "id": 1, "name": "...", "description": "..." }
 author_details = sdk.islamhouse.authors.details(1, "ar")
 
 # Translation card details of an author
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-author-card-translations/{authorId}/{language}/json
+# Response Shape: { "name": "...", "description": "..." }
 author_card = sdk.islamhouse.authors.cardTranslations(1, "ar")
 
 # Material types available for an author
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-author-types-avaliable/{authorId}/{siteLang}/{contentLang}/json
+# Response Shape: [ { "type": "books", "count": 5 } ]
 author_types = sdk.islamhouse.authors.availableTypes(1, "ar", "ar")
 
 # Languages available for an author
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-author-available-languages/{authorId}/{slang}/{language}/json
+# Response Shape: [ { "code": "ar", "name": "Arabic" } ]
 author_langs = sdk.islamhouse.authors.availableLocales(1, "ar", "ar")
 
 # ==========================================
@@ -215,12 +354,18 @@ author_langs = sdk.islamhouse.authors.availableLocales(1, "ar", "ar")
 # ==========================================
 
 # Details of all supported languages on the platform
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/languages/get-language-details/json
+# Response Shape: [ { "code": "ar", "name": "Arabic" } ]
 lang_keys = sdk.islamhouse.languages.keys()
 
 # Interface translation terms for localization
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/languages/get-language-terms/{language}/json
+# Response Shape: { "term_key": "term_value" }
 terms = sdk.islamhouse.languages.terms("ar")
 
 # Available languages relative to another
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/main/get-available-languages/{slang}/{language}/json
+# Response Shape: [ { "code": "ar", "name": "Arabic" } ]
 avail_langs = sdk.islamhouse.languages.availableLanguages("ar", "ar")
 
 # ==========================================
@@ -228,24 +373,38 @@ avail_langs = sdk.islamhouse.languages.availableLanguages("ar", "ar")
 # ==========================================
 
 # Quran recitation categories (reciters, sections)
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-categories/{language}/json
+# Response Shape: [ { "id": 1, "name": "..." } ]
 quran_categories = sdk.islamhouse.quran.categories("ar")
 
 # Basic details of a Quran category
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-category/{categoryId}/{language}/json
+# Response Shape: { "id": 1, "name": "..." }
 quran_category = sdk.islamhouse.quran.singleCategory(1, "ar")
 
 # Details about a specific reciter
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-author/{reciterId}/{language}/json
+# Response Shape: { "id": 1, "name": "..." }
 reciter_details = sdk.islamhouse.quran.authorDetails(1, "ar")
 
 # Recitations list of a specific reciter
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-author-recitations/{reciterId}/{language}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 recitations = sdk.islamhouse.quran.authorRecitations(1, "ar")
 
 # Detailed info of a specific Quran Surah
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-sura/{suraId}/{language}/json
+# Response Shape: { "sura_id": 1, "name": "..." }
 sura_details = sdk.islamhouse.quran.suraDetails(1, "ar")
 
 # Audio recordings of a specific Surah by various reciters
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-sura-recitations/{suraId}/{language}/json
+# Response Shape: [ { "id": 1, "title": "..." } ]
 sura_recitations = sdk.islamhouse.quran.suraRecitations(1, "ar")
 
 # Details of a specific Quran recitation by ID
+# HTTP Endpoint: GET https://api3.islamhouse.com/v3/paV29H2gm56kvLPy/quran/get-recitation/{recitationId}/{language}/json
+# Response Shape: { "id": 228065, "title": "...", "audio_url": "..." }
 recitation = sdk.islamhouse.quran.recitationDetails(228065, "ar")
 ```
 
@@ -261,27 +420,39 @@ recitation = sdk.islamhouse.quran.recitationDetails(228065, "ar")
 # ==========================================
 
 # Get full content of the platform in a specific language
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/get_full_contents?lang={lang}
+# Response Shape: { "data": [ { "id": 81, "name": "...", "description": "..." } ] }
 full_contents = sdk.risalatAlHaramain.contents.getFullContents({
     "language": "en", # Optional: URL language path (default: "en")
     "lang": "en"     # Optional: Query parameter language (default: "en")
 })
 
 # Retrieve contents with optional parameters
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/content?lang={lang}
+# Response Shape: { "data": [ { "id": 81, "name": "..." } ] }
 contents = sdk.risalatAlHaramain.contents.getContents({
     "language": "en",
     "lang": "en"
 })
 
 # Get detailed content of a single item
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/single-content?id={contentId}
+# Response Shape: { "data": { "id": 1, "name": "..." } }
 single_content = sdk.risalatAlHaramain.contents.singleContent(1, "en")
 
 # Quick search items by name
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/name_search?name={name}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 name_search_result = sdk.risalatAlHaramain.contents.nameSearch("حصن", "ar")
 
 # Check available translation languages for an item
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/available_languages/{contentId}
+# Response Shape: { "data": [ { "code": "ar", "name": "Arabic" } ] }
 risala_avail_langs = sdk.risalatAlHaramain.contents.availableLanguages(1, "ar")
 
 # Get translation of a content item into a target language
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/content_translation/{contentId}?language={targetLanguage}
+# Response Shape: { "data": { "id": 1, "translation": "..." } }
 content_translation = sdk.risalatAlHaramain.contents.contentTranslation(1, "en", "ar") # id, targetLanguage, language
 
 # ==========================================
@@ -289,6 +460,8 @@ content_translation = sdk.risalatAlHaramain.contents.contentTranslation(1, "en",
 # ==========================================
 
 # Get Fatwas
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/fatwas?lang={lang}&is_featured={isFeatured}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 fatwas = sdk.risalatAlHaramain.islamicContent.fatwas({
     "language": "en",    # Optional
     "lang": "ar",        # Optional
@@ -296,6 +469,8 @@ fatwas = sdk.risalatAlHaramain.islamicContent.fatwas({
 })
 
 # Get featured Hadiths
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/hadeeths?lang={lang}&is_featured={isFeatured}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 hadeeths = sdk.risalatAlHaramain.islamicContent.hadeeths({
     "language": "en",
     "lang": "ar",
@@ -303,6 +478,8 @@ hadeeths = sdk.risalatAlHaramain.islamicContent.hadeeths({
 })
 
 # Get featured Quran recitations
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/quran?lang={lang}&is_featured={isFeatured}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 quran_content = sdk.risalatAlHaramain.islamicContent.quran({
     "language": "en",
     "lang": "ar",
@@ -314,6 +491,8 @@ quran_content = sdk.risalatAlHaramain.islamicContent.quran({
 # ==========================================
 
 # Keyword text search across platform content
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/search?query={query}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 search_result = sdk.risalatAlHaramain.search.contents("حصن", "en")
 
 # ==========================================
@@ -321,9 +500,13 @@ search_result = sdk.risalatAlHaramain.search.contents("حصن", "en")
 # ==========================================
 
 # Get available languages
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/langs?api_key={apiKey}
+# Response Shape: { "data": [ { "id": 51, "iso_code": "en", "name": "English" } ] }
 risala_langs = sdk.risalatAlHaramain.lookups.languages("en")
 
 # Get available content types
+# HTTP Endpoint: GET https://risala.prh.gov.sa/{language}/Api/content-types
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 content_types = sdk.risalatAlHaramain.lookups.contentTypes("en")
 ```
 
@@ -335,18 +518,28 @@ content_types = sdk.risalatAlHaramain.lookups.contentTypes("en")
 
 ```python
 # 1. Get list of available languages
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/languages/list
+# Response Shape: { "data": [ { "id": 51, "name_en": "English", "iso_code": "en" } ] }
 bayan_langs = sdk.bayanAlIslam.languagesList("ar")
 
 # 2. Get content list tailored for Muslims
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/content/muslims/full_list
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 muslim_list = sdk.bayanAlIslam.muslimList("en")
 
 # 3. Get content list tailored for Non-Muslims
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/content/non-muslims/full_list
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 non_muslim_list = sdk.bayanAlIslam.nonMuslimList("en")
 
 # 4. Get details of a specific content item by ID
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/single-content?id={contentId}
+# Response Shape: { "content": { "id": 22184, "name": "..." } }
 content_details = sdk.bayanAlIslam.singleContent(22184, "en")
 
 # 5. Get languages list paginated and filtered by name
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/paginated-languages?name={name}&page={page}
+# Response Shape: { "data": [ { "id": 51, "name": "..." } ] }
 paginated_langs = sdk.bayanAlIslam.paginatedLanguages({
     "name": "English", # Optional
     "page": 1,         # Optional
@@ -354,6 +547,8 @@ paginated_langs = sdk.bayanAlIslam.paginatedLanguages({
 })
 
 # 6. Get recent contents (Muslim/Non-Muslim updates)
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/recent-contents?lang={lang}&init={init}&ids={ids}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 recent = sdk.bayanAlIslam.recentContents({
     "lang": "ar",
     "init": True,
@@ -362,18 +557,28 @@ recent = sdk.bayanAlIslam.recentContents({
 })
 
 # 7. Get website lookup variables
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/lookups
+# Response Shape: { "data": { "categories": [...] } }
 lookups = sdk.bayanAlIslam.lookups("en")
 
 # 8. Search materials by title/name
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/name_search?name={name}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 search_result = sdk.bayanAlIslam.nameSearch("حصن", "ar")
 
 # 9. Check available translation languages for a content ID
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/available_languages/{contentId}
+# Response Shape: { "data": [ { "code": "ar", "name": "Arabic" } ] }
 avail_langs = sdk.bayanAlIslam.availableLanguages(22184, "ar")
 
 # 10. Get specific translation of a content item
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/content_translation/{contentId}?language={targetLanguage}
+# Response Shape: { "data": { "id": 1, "translation": "..." } }
 translation = sdk.bayanAlIslam.contentTranslation(22184, "en", "ar") # id, targetLanguage, language
 
 # 11. Get translations for media or PDF attachments of a content item
+# HTTP Endpoint: GET https://byenah.com/{language}/Api/attachments_translation/{contentId}?language={targetLanguage}
+# Response Shape: { "data": [ { "file_url": "..." } ] }
 attachments_trans = sdk.bayanAlIslam.attachmentsTranslation(22184, "en", "ar") # id, targetLanguage, language
 ```
 
@@ -389,12 +594,19 @@ attachments_trans = sdk.bayanAlIslam.attachmentsTranslation(22184, "en", "ar") #
 # ==========================================
 
 # Get all comments for a specific content ID
+# HTTP Endpoint: GET https://content.mofeed.org/Api/comments?content_id={contentId}
+# Response Shape: { "message": "", "errors": [], "data": { "current_page": 1, "data": [ { "id": 10702, "comment": "..." } ] } }
 comments = sdk.alMontaka.contents.comments(1)
 
 # Add a new comment to a specific content item
+# HTTP Endpoint: POST https://content.mofeed.org/Api/comment
+# Request Body: content_id={contentId}&comment={comment}
+# Response Shape: { "message": "Comment added successfully" }
 new_comment = sdk.alMontaka.contents.addComment(1, "Test comment")
 
 # Get filtered content by category IDs
+# HTTP Endpoint: GET https://content.mofeed.org/Api/content?category[0]={cat0}&category[1]={cat1}...
+# Response Shape: { "message": "", "errors": [], "data": [ { "id": 1, "title": "..." } ] }
 filtered_content = sdk.alMontaka.contents.content([1, 2])
 
 # ==========================================
@@ -402,27 +614,37 @@ filtered_content = sdk.alMontaka.contents.content([1, 2])
 # ==========================================
 
 # Get target age groups
+# HTTP Endpoint: GET https://content.mofeed.org/Api/age-groups
+# Response Shape: { "message": "", "errors": [], "data": [ { "id": 1, "name": "From 18 to 25" } ] }
 age_groups = sdk.alMontaka.lookups.ageGroups()
 
 # Get categories matching language and name filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/categories?language_id={languageId}&name_cont={nameCont}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 categories = sdk.alMontaka.lookups.categories({
     "languageId": 1,
     "nameCont": "General"
 })
 
 # Get publishing entities matching language and name filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/entities?language_id={languageId}&name_cont={nameCont}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 entities = sdk.alMontaka.lookups.entities({
     "languageId": 1,
     "nameCont": "Dar"
 })
 
 # Get expertise/scientific levels matching filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/expert-levels?language_id={languageId}&name_cont={nameCont}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 expert_levels = sdk.alMontaka.lookups.expertLevels({
     "languageId": 1,
     "nameCont": "Level"
 })
 
 # Get ideologies matching filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/ideologies?language_id={languageId}&name_cont={nameCont}&parent_id={parentId}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 ideologies = sdk.alMontaka.lookups.ideologies({
     "languageId": 1,
     "nameCont": "Sunnah",
@@ -430,30 +652,42 @@ ideologies = sdk.alMontaka.lookups.ideologies({
 })
 
 # Get available languages
+# HTTP Endpoint: GET https://content.mofeed.org/Api/languages
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 languages = sdk.alMontaka.lookups.languages()
 
 # Get/search scholars, narrators, or personalities
+# HTTP Endpoint: GET https://content.mofeed.org/Api/persons?name_cont={nameCont}&page={page}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 persons = sdk.alMontaka.lookups.persons({
     "nameCont": "Muhammad", # Optional
     "page": 1              # Optional
 })
 
 # Get website sections matching filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/sections?language_id={languageId}&name_cont={nameCont}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 sections = sdk.alMontaka.lookups.sections({
     "languageId": 1,
     "nameCont": "Section"
 })
 
 # Get tags matching filter
+# HTTP Endpoint: GET https://content.mofeed.org/Api/tags?language_id={languageId}&name_cont={nameCont}
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 tags = sdk.alMontaka.lookups.tags({
     "languageId": 1,
     "nameCont": "Tag"
 })
 
 # Get targeted groups of audience
+# HTTP Endpoint: GET https://content.mofeed.org/Api/targeted-groups
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 targeted_groups = sdk.alMontaka.lookups.targetedGroups()
 
 # Get integrated YouTube channels list
+# HTTP Endpoint: GET https://content.mofeed.org/Api/youtube-channels
+# Response Shape: { "data": [ { "id": 1, "name": "..." } ] }
 youtube_channels = sdk.alMontaka.lookups.youtubeChannels()
 ```
 
