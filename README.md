@@ -4,6 +4,9 @@ An integrated and easy-to-use software library for Python developers to fetch au
 
 This project is developed for [The Association for Multi-lingual Islamic Content](https://islamiccontent.sa/).
 
+> [!TIP]
+> **AI & LLM Integration**: You can also use the official [Model Context Protocol (MCP) Server](https://www.npmjs.com/package/islamic-content-mcp-server) to connect this SDK directly to AI assistants like Claude Desktop, Cursor, VS Code, and more.
+
 ---
 
 ## Services Overview
