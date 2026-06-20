@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name="islamic-content-sdk",
-    version="1.0.0",
+    version="1.0.1",
     author="The Association for Multi-lingual Islamic Content",
     author_email="info@islamiccontent.sa",
     description="An integrated and easy-to-use software library to fetch authentic Islamic content (Holy Quran and Hadith) in multiple languages.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/2yousefreda/islamic-content-sdk-npm", # Or update when Py repository is ready
+    url="https://github.com/2yousefreda/islamic-content-sdk-pip",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
