@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="islamic-content-sdk",
-    version="1.0.1",
+    version="1.0.2",
     author="The Association for Multi-lingual Islamic Content",
     author_email="info@islamiccontent.sa",
     description="An integrated and easy-to-use software library to fetch authentic Islamic content (Holy Quran and Hadith) in multiple languages.",
