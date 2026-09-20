@@ -6,6 +6,15 @@ class AlMontakaContentsService(BaseService):
         super().__init__()
         self.baseurl = baseurl
 
+    def list(self, page: int = 1, categories: list = None):
+        query_params = {"page": str(page)}
+        if categories and len(categories) > 0:
+            for index, cat in enumerate(categories):
+                query_params[f"category[{index}]"] = str(cat)
+        query = urlencode(query_params)
+        url = f"{self.baseurl}/content?{query}"
+        return self._request(url)
+
     def comments(self, content_id: int):
         url = f"{self.baseurl}/comments?content_id={content_id}"
         return self._request(url)
@@ -23,13 +32,7 @@ class AlMontakaContentsService(BaseService):
             {"Content-Type": "application/x-www-form-urlencoded"}
         )
 
-    def content(self, categories: list):
-        query_params = {}
-        for index, cat in enumerate(categories):
-            query_params[f"category[{index}]"] = str(cat)
-        query = urlencode(query_params)
-        url = f"{self.baseurl}/content?{query}"
-        return self._request(url)
+
 
 
 class AlMontakaLookupsService(BaseService):

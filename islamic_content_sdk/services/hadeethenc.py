@@ -10,10 +10,13 @@ class HadeethencService(BaseService):
         url = f"{self.baseurl}/languages"
         return self._request(url)
 
-    def categories(self, language_code: str):
+    def categories(self, language_code: str, parent_id: int = None):
         query = urlencode({"language": language_code})
         url = f"{self.baseurl}/categories/list/?{query}"
-        return self._request(url)
+        result = self._request(url)
+        if parent_id is not None and isinstance(result, list):
+            return [c for c in result if str(c.get("parent_id")) == str(parent_id)]
+        return result
 
     def rootCategories(self, language_code: str):
         query = urlencode({"language": language_code})

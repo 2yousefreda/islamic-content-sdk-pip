@@ -99,16 +99,18 @@ class IslamhouseAuthorsService(BaseService):
         super().__init__()
         self.baseurl = baseurl
 
+
     def list(self, params=None):
         if params is None:
             params = {}
         kind = params.get("kind", "showall")
-        locale = params.get("locale", "showall")
+        category = "showall"
         sort = params.get("sort", "countdesc")
+        locale = params.get("locale", "ar")
         page = params.get("page", 1)
         per_page = params.get("perPage", 20)
 
-        url = f"{self.baseurl}/main/get-authors-data/{kind}/{locale}/{sort}/{page}/{per_page}/json"
+        url = f"{self.baseurl}/main/get-authors-data/{kind}/{category}/{sort}/{locale}/{page}/{per_page}/json"
         return self._request(url)
 
     def details(self, author_id: int, language: str):
@@ -167,9 +169,7 @@ class IslamhouseQuranService(BaseService):
         url = f"{self.baseurl}/quran/get-author-recitations/{author_id}/{language}/json"
         return self._request(url)
 
-    def suraDetails(self, sura_id: int, language: str):
-        url = f"{self.baseurl}/quran/get-sura/{sura_id}/{language}/json"
-        return self._request(url)
+
 
     def suraRecitations(self, sura_id: int, language: str):
         url = f"{self.baseurl}/quran/get-sura-recitations/{sura_id}/{language}/json"

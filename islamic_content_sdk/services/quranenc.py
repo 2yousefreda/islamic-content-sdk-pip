@@ -36,6 +36,4 @@ class QuranencService(BaseService):
             "content_type": "audio/mpeg"
         }
 
-    def addNote(self, payload: dict):
-        url = f"{self.baseurl}/translations/note"
-        return self._request(url, "POST", payload)
+

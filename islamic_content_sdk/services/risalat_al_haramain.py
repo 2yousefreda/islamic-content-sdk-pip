@@ -27,17 +27,9 @@ class RisalaContentsService(BaseService):
         url = f"{self.baseurl}/{language}/{self.api_path}/single-content?id={content_id}"
         return self._request(url)
 
-    def nameSearch(self, name: str, language: str = "ar"):
-        url = f"{self.baseurl}/{language}/{self.api_path}/name_search?name={quote(name)}"
-        return self._request(url)
 
-    def availableLanguages(self, content_id: int, language: str = "ar"):
-        url = f"{self.baseurl}/{language}/{self.api_path}/available_languages/{content_id}"
-        return self._request(url)
 
-    def contentTranslation(self, content_id: int, target_language: str, language: str = "en"):
-        url = f"{self.baseurl}/{language}/{self.api_path}/content_translation/{content_id}?language={target_language}"
-        return self._request(url)
+
 
 
 class RisalaIslamicContentService(BaseService):
@@ -80,8 +72,8 @@ class RisalaSearchService(BaseService):
         self.baseurl = baseurl
         self.api_path = api_path
 
-    def contents(self, query: str, language: str = "en"):
-        url = f"{self.baseurl}/{language}/{self.api_path}/search?query={quote(query)}"
+    def contents(self, query: str, language: str = "en", page: int = 1):
+        url = f"{self.baseurl}/{language}/{self.api_path}/search?query={quote(query)}&page={page}"
         return self._request(url)
 
 

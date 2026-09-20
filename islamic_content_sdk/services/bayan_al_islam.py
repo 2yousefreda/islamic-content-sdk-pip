@@ -11,17 +11,15 @@ class BayanAlIslamService(BaseService):
         url = f"{self.baseurl}/{language}/Api/languages/list"
         return self._request(url)
 
-    def muslimList(self, language: str = "en"):
-        url = f"{self.baseurl}/{language}/Api/content/muslims/full_list"
+    def muslimList(self, language: str = "en", page: int = 1):
+        url = f"{self.baseurl}/{language}/Api/content/muslims/full_list?page={page}"
         return self._request(url)
 
-    def nonMuslimList(self, language: str = "en"):
-        url = f"{self.baseurl}/{language}/Api/content/non-muslims/full_list"
+    def nonMuslimList(self, language: str = "en", page: int = 1):
+        url = f"{self.baseurl}/{language}/Api/content/non-muslims/full_list?page={page}"
         return self._request(url)
 
-    def singleContent(self, content_id: int, language: str = "en"):
-        url = f"{self.baseurl}/{language}/Api/single-content?id={content_id}"
-        return self._request(url)
+
 
     def paginatedLanguages(self, params=None):
         if params is None:
@@ -58,14 +56,4 @@ class BayanAlIslamService(BaseService):
         url = f"{self.baseurl}/{language}/Api/name_search?name={quote(name)}"
         return self._request(url)
 
-    def availableLanguages(self, content_id: int, language: str = "ar"):
-        url = f"{self.baseurl}/{language}/Api/available_languages/{content_id}"
-        return self._request(url)
 
-    def contentTranslation(self, content_id: int, target_language: str, language: str = "en"):
-        url = f"{self.baseurl}/{language}/Api/content_translation/{content_id}?language={target_language}"
-        return self._request(url)
-
-    def attachmentsTranslation(self, content_id: int, target_language: str, language: str = "en"):
-        url = f"{self.baseurl}/{language}/Api/attachments_translation/{content_id}?language={target_language}"
-        return self._request(url)
